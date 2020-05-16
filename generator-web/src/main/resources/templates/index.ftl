@@ -9,6 +9,67 @@
     <@netCommon.commonStyle />
     <@netCommon.commonScript />
 
+    <style>
+        <#-- 自定义样式 -->
+
+        h4 {
+            text-align: center;
+        }
+
+        .CodeMirror {
+            border: 1px solid #eeeeee;
+        }
+
+        .jumbotron {
+            padding: 2rem 1rem;
+        }
+
+        .input-group-text {
+            color: #ffffff;
+            background-color: #1890ff;
+            border: none;
+            border-top-left-radius: .25rem !important;
+            border-bottom-left-radius: .25rem !important;
+        }
+
+        .input-group>.custom-select:not(:first-child), .input-group>.form-control:not(:first-child) {
+            margin-right: 20px;
+        }
+
+        .input-group input,
+        .input-group select {
+            border-top-right-radius: .25rem !important;
+            border-bottom-right-radius: .25rem !important;
+        }
+
+        .input-group input:last-of-type,
+        .input-group select:last-of-type{
+            margin-right: 0 !important;
+        }
+
+        .btn-primary.disabled, .btn-primary:disabled {
+            background-color: #1890ff;
+            opacity: 1;
+        }
+
+        #btnCopy {
+            display: none;
+            background-color: #ffffff;
+        }
+
+        .btn-secondary.disabled, .btn-secondary:disabled {
+            background-color: #1890ff;
+            border: none;
+        }
+
+        .bd-footer,
+        .bd-footer a{
+            font-size: 12px;
+            color: #dedede !important;
+            text-align: center;
+        }
+    </style>
+
 <script>
 
     <@netCommon.viewerCounter />
@@ -93,6 +154,13 @@
                         $.toast("√ 代码生成成功");
                         //添加历史记录
                         addHistory(codeData);
+
+                        // 显示复制按钮
+                        // 如果是 http，获取不到 navigator.clipboard 对象，则不需要显示
+                        if (navigator.clipboard) {
+                            $("#btnCopy").show()
+                        }
+
                     } else {
                         $.toast("× 代码生成失败 :"+data.msg);
                     }
@@ -128,7 +196,7 @@
                 if(valueSession!==undefined && valueSession!=null){
                     sessionStorage.removeItem(tableName);
                 }else{
-                    $("#history").prepend('<button id="his-'+tableName+'" type="button" class="btn">'+tableName+'</button>');
+                    $("#history").prepend('<button id="his-'+tableName+'" type="button" class="btn btn-light btn-sm">'+tableName+'</button>');
                     //$("#history").prepend('<button id="his-'+tableName+'" onclick="getHistory(\''+tableName+'\');" type="button" class="btn">'+tableName+'</button>');
                     $("#his-"+tableName).bind('click', function () {getHistory(tableName)});
                 }
@@ -199,35 +267,25 @@
     });
 </script>
 </head>
-<body style="background-color: #e9ecef">
-
-    <div class="container">
-        <nav class="navbar navbar-dark bg-primary btn-lg">
-            <a class="navbar-brand" href="http://www.bejson.com">BeJSON在线工具站</a>
-            <ul class="nav navbar-nav">
-                <li class="nav-item active">
-                    <a class="nav-link" href="http://zhengkai.blog.csdn.net">大狼狗CSDN</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
+<body>
 
 <!-- Main jumbotron for a primary marketing message or call to action -->
-<div class="jumbotron">
+<div class="jumbotron" style="background-color: #ffffff">
     <div class="container">
-        <h2>Spring Boot Code Generator!</h2>
-        <p class="lead">
-            √基于SpringBoot2+Freemarker的<a class="lead" href="https://github.com/moshowgame/SpringBootCodeGenerator">代码生成器</a>，√以释放双手为目的，√支持mysql/oracle/pgsql三大数据库，<br>
-            √用DDL-SQL语句生成JPA/JdbcTemplate/Mybatis/MybatisPlus/BeetlSQL相关代码。<br>
-            如果发现有SQL语句不能识别，请<a href="https://github.com/moshowgame/SpringBootCodeGenerator/issues">留言</a>，同时欢迎大家提<a href="https://github.com/moshowgame/SpringBootCodeGenerator/pulls">PR</a>和<a href="#" id="donate1">赞赏</a>，谢谢！<a id="version" href="#">查看版本</a>
-        </p>
-        <div id="donate" class="container" show="no"></div>
-        <hr>
+        <h4>Spring Boot 代码在线生成</h4><br>
+        <textarea id="ddlSqlArea" placeholder="请输入表结构信息..." class="form-control btn-lg" style="height: 250px;">
+CREATE TABLE 'userinfo' (
+  'user_id' int(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+  'username' varchar(255) NOT NULL COMMENT '用户名',
+  'addtime' datetime NOT NULL COMMENT '创建时间',
+  PRIMARY KEY ('user_id')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户信息'
+        </textarea><br>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text">作者名称</span>
             </div>
-            <input type="text" class="form-control" id="authorName" name="authorName" value="大狼狗">
+            <input type="text" class="form-control" id="authorName" name="authorName" value="Coande">
             <div class="input-group-prepend">
                 <span class="input-group-text">返回封装</span>
             </div>
@@ -235,7 +293,7 @@
             <div class="input-group-prepend">
                 <span class="input-group-text">包名路径</span>
             </div>
-            <input type="text" class="form-control" id="packageName" name="packageName" value="com.softdev.system">
+            <input type="text" class="form-control" id="packageName" name="packageName" value="com.e12e.system">
         </div>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
@@ -276,15 +334,7 @@
                 <option value="true">开启</option>
             </select>
         </div>
-        <textarea id="ddlSqlArea" placeholder="请输入表结构信息..." class="form-control btn-lg" style="height: 250px;">
-CREATE TABLE 'userinfo' (
-  'user_id' int(11) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  'username' varchar(255) NOT NULL COMMENT '用户名',
-  'addtime' datetime NOT NULL COMMENT '创建时间',
-  PRIMARY KEY ('user_id')
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户信息'
-        </textarea><br>
-        <p><button class="btn btn-primary btn-lg disabled" id="btnGenCode" role="button" data-toggle="popover" data-content="">开始生成 »</button> <button class="btn alert-secondary" id="btnCopy">一键复制</button></p>
+        <p><button class="btn btn-primary disabled" id="btnGenCode" role="button" data-toggle="popover" data-content="">开始生成 »</button> <button class="btn alert-secondary" id="btnCopy">一键复制</button></p>
         <div id="history" class="btn-group" role="group" aria-label="Basic example"></div>
         <hr>
         <!-- Example row of columns -->
